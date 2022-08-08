@@ -218,6 +218,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
+            yum update -y
             curl -fsSL https://rpm.nodesource.com/setup_13.x | sudo bash -
             yum install nodejs npm tar
       - attach_workspace:
