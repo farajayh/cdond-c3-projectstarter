@@ -220,7 +220,7 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            yum install nodejs npm
+            yum install nodejs npm tar
       - run:
           name: Get backend url
           command: |
