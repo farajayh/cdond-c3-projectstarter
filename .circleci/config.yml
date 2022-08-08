@@ -23,9 +23,8 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS=$(curl --insecure  https://kvdb.io/W4yGa9BkawNR3VrUVfRaGU/migration_<< parameters.workflow-id >>)
-            SUCCESS = 1
-            if(( $SUCCESS==1 )); 
+            export SUCCESS=$(curl --insecure  https://kvdb.io/W4yGa9BkawNR3VrUVfRaGU/migration_<< parameters.workflow-id >>)
+            if(( ${SUCCESS}==1 )); 
             then
               cd ~/project/backend
               npm install
@@ -173,8 +172,8 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
-            chmod -R 755 /usr/local/aws
-            chmod -R 755 /usr/local/bin/aws
+            chmod -R 777 /usr/local/aws
+            chmod -R 777 /usr/local/bin/aws
       - run:
           name: Configure server
           command: |
@@ -187,6 +186,14 @@ jobs:
       - image: circleci/node:13.8.0
     steps:
       - checkout
+      - run:
+          name: install dependencies
+          command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
+            chmod -R 777 /usr/local/aws
+            chmod -R 777 /usr/local/bin/aws
       - run:
           name: Run migrations
           command: |
