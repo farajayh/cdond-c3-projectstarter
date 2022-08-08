@@ -11,8 +11,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            sudo aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow-id >>
-            sudo aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflow-id >>
+            aws cloudformation delete-stack --stack-name udapeople-frontend-<< parameters.workflow-id >>
+            aws cloudformation delete-stack --stack-name udapeople-backend-<< parameters.workflow-id >>
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
     parameters:
@@ -153,7 +153,7 @@ jobs:
       - persist_to_workspace:
           root: ~/
           paths:
-            - project/.circleci/ansible/
+            - project/.circleci/ansible/inventory.txt
       - destroy-environment:
           workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"
   configure-infrastructure:
@@ -173,12 +173,14 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
+            chmod -R 755 /usr/local/aws
+            chmod -R 755 /usr/local/bin/aws
       - run:
           name: Configure server
           command: |
-            cat ~/project/.circleci/ansible/inventory.txt
+            cat project/.circleci/ansible/inventory.txt
             cd .circleci/ansible
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt configure-server.yml
+            ansible-playbook -i project/.circleci/ansible/inventory.txt configure-server.yml
       - destroy-environment:
           workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"    
   run-migrations:
