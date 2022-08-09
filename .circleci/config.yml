@@ -220,7 +220,7 @@ jobs:
           command: |
             yum update -y
             curl -fsSL https://rpm.nodesource.com/setup_13.x | bash -
-            yum install nodejs tar
+            yum -y install nodejs tar
       - attach_workspace:
           at: ~/ 
       - run:
