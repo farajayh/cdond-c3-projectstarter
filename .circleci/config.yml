@@ -192,7 +192,6 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             sudo ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
-            
       - run:
           name: Run migrations
           command: |
@@ -243,7 +242,40 @@ jobs:
           workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"
       - revert-migrations:
           workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"  
-            
+  deploy-backend:
+    docker: 
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: ["6b:7a:6b:db:84:d5:41:38:c5:35:06:de:0a:99:15:01"]
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --update ansible
+            apk add curl gzip tar nodejs
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            ./aws/install
+      - run:
+          name: Deploy backend
+          command: |
+            cd backend
+            npm i
+            npm run build
+            cd ..
+            # Zip the directory
+            tar -C backend -czvf artifact.tar.gz .
+            cd .circleci/ansible
+            echo "Contents  of the inventory.txt file is -------"
+            cat project/.circleci/ansible/inventory.txt
+            ansible-playbook -i project/.circleci/ansible/inventory.txt deploy-backend.yml
+      - destroy-environment:
+          workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"
+      - revert-migrations:
+          workflow-id: "${CIRCLE_WORKFLOW_ID:0:7}"    
 
 workflows:
   default:
