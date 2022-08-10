@@ -294,17 +294,13 @@ jobs:
             curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
             unzip awscliv2.zip
             ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
-            chmod  777 /usr/local/aws
-            chmod  777 /usr/local/bin/aws
-      - run:
-          name: Get backend url
-          command: |
-            export BACKEND_IP=$(cat ~/project/.circleci/ansible/inventory.txt)
-            export API_URL="http://${BACKEND_IP}"
-            echo "API_URL = ${API_URL}"
+            chmod +x ~/.local/bin/aws
       - run:
           name: Backend smoke test.
           command: |
+            export BACKEND_IP=$(cat ~/project/.circleci/ansible/inventory.txt)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "API_URL = ${API_URL}"
             if curl "${API_URL}/api/status" | grep "ok"
             then
                 return 0
