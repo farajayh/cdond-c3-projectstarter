@@ -296,7 +296,7 @@ jobs:
             ./aws/install -i /usr/local/aws -b /usr/local/bin/aws
             chmod +x ~/.local/bin/aws
       - run:
-          name: Backend smoke test.
+          name: Backend smoke test. 
           command: |
             export BACKEND_IP=$(cat ~/project/.circleci/ansible/inventory.txt)
             export API_URL="http://${BACKEND_IP}:3030"
